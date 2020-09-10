@@ -2,6 +2,8 @@ package Tree;
 
 import DataArray.Cat;
 
+import java.util.List;
+
 public class Tree {
     //node
     //insert
@@ -32,6 +34,12 @@ public class Tree {
         }
     }
     TreeNode root;
+
+    public Tree(List<Integer> sampleData){
+        for (int i = 0; i < sampleData.size(); i++) {
+            insert(new Cat(sampleData.get(i), "Cat" + sampleData.get(i)));
+        }
+    }
 
     public void insert(Cat c){
         TreeNode node = new TreeNode(c);
@@ -148,5 +156,25 @@ public class Tree {
             s.right = node.right;
         }
         return s;
+    }
+
+    public boolean isBalanced(boolean precision){
+        return Math.abs(countDepth(root.left) - countDepth(root.right))
+                <= ((precision) ? 0 : 1);
+    }
+
+    private int countDepth(TreeNode node){
+        if (node == null) return 0;
+
+        int left = 0;
+        int right = 0;
+
+        if (node.left != null)
+            left = countDepth(node.left);
+
+        if (node.right != null)
+            right = countDepth(node.right);
+
+        return 1 + ((left > right) ? left : right);
     }
 }
