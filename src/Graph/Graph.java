@@ -8,6 +8,7 @@ public class Graph {
     private class Vertex{
         char label;
         boolean wasVisited;
+        Vertex parent;
 
         public Vertex(char label){
             this.label = label;
@@ -44,6 +45,10 @@ public class Graph {
 
     public void displayVertex(int vertex){
         System.out.println(vertexList[vertex]);
+    }
+
+    public void showVertex(int vertex){
+        System.out.println(vertexList[vertex] + "-> ");
     }
 
     private int getUnvisitedVertex(int ver){
@@ -96,5 +101,82 @@ public class Graph {
                 queue.insert(vNext);
             }
         }
+    }
+
+    public Queue widthTraversPath(char from, char to){
+        int start = getIndex(from);
+        int stop = getIndex(to);
+
+        Queue queue = new Queue(MAX_VERTICES);
+        vertexList[start].wasVisited = true;
+        queue.insert(start);
+        boolean done = false;
+        while (!queue.isEmpty()){
+            int v1 =queue.remove();
+            int v2;
+            while ((v2 = getUnvisitedVertex(v1)) != 1){
+                vertexList[v2].wasVisited = true;
+
+                if (v2 == stop){
+                    done = true;
+                    break;
+                }
+                queue.insert(v2);
+            }
+        }
+        resetFlags();
+        if (done)
+            return queue;
+        else
+            return null;
+    }
+
+    private int getIndex(char c){
+        for (int i = 0; i < vertexList.length ; i++) {
+            if (vertexList[i].label == c)
+                return i;
+        }
+        return -1;
+    }
+
+    StackX shortWay(char from, char to){                // граф не взвешен
+        StackX result = new StackX(MAX_VERTICES);
+        Queue queue = new Queue(MAX_VERTICES);
+
+        int start = getIndex(from);
+        int stop = getIndex(to);
+        if (start == -1 || stop == -1 || start == stop)
+            return null;
+
+        vertexList[start].wasVisited = true;
+        queue.insert(start);
+        while (!queue.isEmpty()){                        // ищем узел, помечаем родителя
+            int vCur = queue.remove();
+            int vNxt;
+            while ((vNxt = getUnvisitedVertex(vCur)) != 1){
+                vertexList[vNxt].parent = vertexList[vCur];
+                vertexList[vNxt].wasVisited = true;
+                if (vNxt == stop) break;
+                queue.insert(vNxt);
+            }
+            if (vNxt == stop) break;
+        }
+        if (!vertexList[stop].wasVisited) return null;
+
+        result.push(vertexList[stop].label);
+        int current = stop;
+        while (vertexList[current].parent != null)        // идем обратно к старту по родителям
+            for (int i = 0; i <vertexList.length ; i++) {
+                if (vertexList[current].parent == vertexList[i]){
+                    result.push(vertexList[i].label);
+                    current = i;
+                    break;
+                }
+            }
+        for (int i = 0; i < size; i++) {
+            vertexList[i].wasVisited = false;
+            vertexList[i].parent =null;
+        }
+            return null;
     }
 }
